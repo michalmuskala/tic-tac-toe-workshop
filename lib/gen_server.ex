@@ -17,6 +17,10 @@ defmodule TicTacToe.GenServer do
     GenServer.call(server, :print)
   end
 
+  def print_to_screen(server) do
+    GenServer.cast(server, :print_to_screen)
+  end
+
   ## GenServer implementation
 
   # => = >
@@ -39,6 +43,12 @@ defmodule TicTacToe.GenServer do
   def handle_call(:print, _metadata, state) do
     %{:board => board} = state
     {:reply, board, state}
+  end
+
+  def handle_cast(:print_to_screen, %{:board => board, :player => player} = state) do
+    board_string = Board.print(board)
+    IO.puts("#{board_string}\nNext player: #{player}")
+    {:noreply, state}
   end
 
   defp next_player(:x), do: :o

@@ -27,4 +27,16 @@ defmodule TicTacToe.Board do
   def find_winner({{p,_,_},{_,p,_},{_,_,p}}) when p != :empty, do: p
   def find_winner({{_,_,p},{_,p,_},{p,_,_}}) when p != :empty, do: p
   def find_winner(_), do: :no_winner
+
+  def print({row1, row2, row3}) do
+    "#{print_row(row1)}\n#{print_row(row2)}\n#{print_row(row3)}"
+  end
+
+  defp print_row({elem1, elem2, elem3}) do
+    "#{stringify_element(elem1)}|#{stringify_element(elem2)}|#{stringify_element(elem3)}"
+  end
+
+  defp stringify_element(:empty), do: "   "
+  defp stringify_element(:x), do: " x "
+  defp stringify_element(:o), do: " o "
 end
