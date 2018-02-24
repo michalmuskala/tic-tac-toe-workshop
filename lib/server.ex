@@ -8,19 +8,20 @@ defmodule TicTacToe.Server do
   end
 
   def call(pid, msg) do
-    send(pid, {msg, self()})
+    ref = make_ref()
+    send(pid, {msg, self(), ref})
     receive do
-      reply -> reply
+      {^ref, reply} -> reply
     end
   end
 
   defp loop(board, next_player) do
     receive do
-      {{:move, x, y}, reply_to} ->
-        new_board = handle_move(board, next_player, x, y, reply_to)
+      {{:move, x, y}, reply_to, ref} ->
+        new_board = handle_move(board, next_player, x, y, reply_to, ref)
         loop(new_board, next_player(next_player))
-      {:print, reply_to} ->
-        handle_print(board, reply_to)
+      {:print, reply_to, ref} ->
+        handle_print(board, reply_to, ref)
         loop(board, next_player)
       msg ->
         Logger.error("Unexpected message in process #{inspect self()}: #{inspect msg}")
@@ -30,17 +31,17 @@ defmodule TicTacToe.Server do
   defp next_player(:x), do: :o
   defp next_player(:o), do: :x
 
-  defp handle_print(board, reply_to) do
-    send(reply_to, board)
+  defp handle_print(board, reply_to, ref) do
+    send(reply_to, {ref, board})
   end
 
-  defp handle_move(board, next_player, x, y, reply_to) do
+  defp handle_move(board, next_player, x, y, reply_to, ref) do
     case Board.move(board, x, y, next_player) do
       :not_allowed ->
-        send(reply_to, :not_allowed)
+        send(reply_to, {ref, :not_allowed})
         board
       new_board ->
-        send(reply_to, :ok)
+        send(reply_to, {ref, :ok})
         new_board
     end
   end
