@@ -10,22 +10,18 @@ defmodule TicTacToe.ServerTest do
 
   test "we can move" do
     pid = Server.spawn()
-    send(pid, {:move, 0, 0, self()})
-    assert_receive :ok
+    assert Server.call(pid, {:move, 0, 0}) == :ok
   end
 
   test "we cannot move twice" do
     pid = Server.spawn()
-    send(pid, {:move, 0, 0, self()})
-    assert_receive :ok
-    send(pid, {:move, 0, 0, self()})
-    assert_receive :not_allowed
+    assert Server.call(pid, {:move, 0, 0}) == :ok
+    assert Server.call(pid, {:move, 0, 0}) == :not_allowed
   end
 
   test "we can print!" do
     pid = Server.spawn()
-    send(pid, {:print, self()})
-    assert_receive {
+    assert Server.call(pid, :print) == {
       {:empty, :empty, :empty},
       {:empty, :empty, :empty},
       {:empty, :empty, :empty}
@@ -34,12 +30,9 @@ defmodule TicTacToe.ServerTest do
 
   test "player is changing" do
     pid = Server.spawn()
-    send(pid, {:move, 0, 0, self()})
-    assert_receive :ok
-    send(pid, {:move, 0, 1, self()})
-    assert_receive :ok
-    send(pid, {:print, self()})
-    assert_receive {
+    assert Server.call(pid, {:move, 0, 0}) == :ok
+    assert Server.call(pid, {:move, 0, 1}) == :ok
+    assert Server.call(pid, :print) == {
       {:x, :o, :empty},
       {:empty, :empty, :empty},
       {:empty, :empty, :empty}
