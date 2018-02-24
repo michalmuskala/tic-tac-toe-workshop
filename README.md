@@ -12,3 +12,8 @@ Clone this repo and run
 * `iex -S mix`
 
 If you see a shell prompt, everything compiled fine and you're good to go!
+
+## Usage
+
+Compile project: `mix compile`
+Open shell in the project: `iex -S mix`
