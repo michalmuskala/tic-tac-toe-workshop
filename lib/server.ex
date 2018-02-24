@@ -4,7 +4,7 @@ defmodule TicTacToe.Server do
   require Logger
 
   def spawn() do
-    spawn(fn -> loop(Board.new(), :x) end)
+    spawn_link(fn -> loop(Board.new(), :x) end)
   end
 
   def call(pid, msg) do

@@ -8,6 +8,21 @@ defmodule TicTacToe.ServerTest do
     assert is_pid(pid)
   end
 
+  test "we don't leak processes" do
+    test = self()
+    starter = spawn(fn ->
+      server = Server.spawn()
+      send(test, server)
+      :timer.sleep(:infinity)
+    end)
+    receive do
+      server ->
+        Process.exit(starter, :shutdown)
+        :timer.sleep(100)
+        refute Process.alive?(server)
+    end
+  end
+
   test "we can move" do
     pid = Server.spawn()
     assert Server.call(pid, {:move, 0, 0}) == :ok
